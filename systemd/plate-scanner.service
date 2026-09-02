@@ -1,0 +1,16 @@
+[Unit]
+Description=License plate + GPS scanner
+After=network-online.target gpsd.service
+Wants=gpsd.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/plate-scanner
+Environment=PYTHONPATH=/home/pi/plate-scanner/src
+ExecStart=/usr/bin/python3 -m plate_scanner.main --config /home/pi/plate-scanner/config.yaml
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
