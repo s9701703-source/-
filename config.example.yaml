@@ -1,0 +1,67 @@
+# License Plate Scanner configuration.
+# Copy this file to config.yaml and adjust for your hardware, then run:
+#   python -m plate_scanner.main --config config.yaml
+
+cameras:
+  # OpenCV device index or /dev/videoN path for each side mirror camera.
+  left:
+    source: /dev/video0
+    label: left
+  right:
+    source: /dev/video2
+    label: right
+  # Frames captured per second from each camera.
+  fps: 5
+
+gps:
+  # "gpsd" talks to a local gpsd daemon (recommended on Raspberry Pi OS,
+  # `sudo apt install gpsd gpsd-clients` then point it at your USB GPS dongle).
+  # "serial" reads raw NMEA sentences directly from a serial device.
+  backend: gpsd
+  gpsd_host: 127.0.0.1
+  gpsd_port: 2947
+  serial_port: /dev/ttyUSB0
+  serial_baud: 9600
+  # Reject fixes older than this many seconds when tagging a plate.
+  max_fix_age_seconds: 5.0
+
+recognition:
+  # Path to the OpenCV Haar cascade used for locating plate regions.
+  # A generic cascade is vendored at resources/haarcascade_russian_plate_number.xml;
+  # it's tuned on rectangular plates in general rather than any one country's
+  # format, so accuracy varies -- the hybrid cloud step exists to compensate.
+  cascade_path: resources/haarcascade_russian_plate_number.xml
+  min_plate_width_px: 60
+  min_plate_height_px: 20
+  # Local OCR (pytesseract) confidence (0-100) required to accept the
+  # reading without escalating to the cloud recognizer.
+  local_accept_confidence: 75.0
+  # Below this, the reading is discarded entirely (too unreliable even to
+  # send to the cloud).
+  local_min_confidence: 35.0
+  allowed_characters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
+
+cloud:
+  # Hybrid escalation: only used when local OCR confidence falls between
+  # local_min_confidence and local_accept_confidence.
+  enabled: false
+  provider: plate_recognizer
+  api_url: "https://api.platerecognizer.com/v1/plate-reader/"
+  api_key: ""
+  timeout_seconds: 4.0
+
+dedup:
+  # Two readings within this window and within max_edit_distance of each
+  # other are treated as the same vehicle sighting and only stored once.
+  window_seconds: 30.0
+  max_edit_distance: 1
+
+storage:
+  database_path: data/plate_scanner.sqlite3
+  # Save a cropped image of each accepted plate reading alongside the DB row.
+  save_plate_crops: true
+  crops_dir: data/crops
+
+logging:
+  level: INFO
+  file: data/plate_scanner.log

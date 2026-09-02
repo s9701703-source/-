@@ -1,0 +1,13 @@
+# Pinned below 5.0: OpenCV 5 dropped cv2.CascadeClassifier from the Python
+# bindings, which the plate detector depends on.
+opencv-python-headless>=4.8,<5
+pytesseract>=0.3.10,<0.4
+pynmea2>=1.19,<2
+pyserial>=3.5,<4
+gpsd-py3>=0.3,<0.4
+PyYAML>=6.0,<7
+requests>=2.31,<3
+python-Levenshtein>=0.21,<0.22
+
+# dev / test only
+pytest>=7.4,<8
