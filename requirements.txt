@@ -7,7 +7,12 @@ pyserial>=3.5,<4
 gpsd-py3>=0.3,<0.4
 PyYAML>=6.0,<7
 requests>=2.31,<3
-python-Levenshtein>=0.21,<0.22
+
+# python-Levenshtein is optional: it speeds up dedup.py's string-distance
+# check, which falls back to a pure-Python implementation when the package
+# isn't installed. Skipped by default since it needs a C compiler and has
+# no prebuilt wheel on newer Python versions yet.
+# python-Levenshtein>=0.21,<0.22
 
 # dev / test only
 pytest>=7.4,<8
